@@ -1,1 +1,46 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "InfoDisplay"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local function createLabel(name, position)
+	local label = Instance.new("TextLabel")
+	label.Name = name
+	label.Size = UDim2.new(0, 300, 0, 30)
+	label.Position = position
+	label.BackgroundTransparency = 1
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextScaled = true
+	label.Font = Enum.Font.SourceSans
+	label.TextStrokeTransparency = 0
+	label.TextStrokeColor3 = Color3.new(0, 0, 0)
+	label.TextXAlignment = Enum.TextXAlignment.Left -- 🔹 This line aligns the text to the left
+	label.Parent = screenGui
+	return label
+end
+
+-- Top right layout
+local posLabel = createLabel("PositionLabel", UDim2.new(1, -310, 0, 0))
+local rotLabel = createLabel("RotationLabel", UDim2.new(1, -310, 0, 35))
+local velLabel = createLabel("VelocityLabel", UDim2.new(1, -310, 0, 70))
+
+-- Update GUI every frame
+RunService.RenderStepped:Connect(function()
+	if rootPart then
+		local pos = rootPart.Position
+		local rot = rootPart.Orientation
+		local vel = rootPart.Velocity
+
+		posLabel.Text = string.format("pos: %.1f, %.1f, %.1f", pos.X, pos.Y, pos.Z) -- position
+		rotLabel.Text = string.format("ang: %.1f, %.1f, %.1f", rot.X, rot.Y, rot.Z) -- angle
+		velLabel.Text = string.format("vel: %.1f", vel.Magnitude) -- velocity
+	end
+end)
